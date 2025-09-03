@@ -146,15 +146,16 @@ export class QuickBooksService {
     }
 
     try {
-      const queryParams = new URLSearchParams({
-        minorversion: '65',
-        ...(params.limit && { maxresults: params.limit.toString() }),
-        ...(params.offset && { startposition: params.offset.toString() }),
-        ...(params.nameFilter && { name: params.nameFilter }),
-      });
+      // Use a simpler query that works with QuickBooks sandbox
+      const query = 'SELECT * FROM Customer ORDER BY Name';
 
       const response = await this.client.get(`/v3/company/${this.realmId}/query`, {
-        params: { query: `SELECT * FROM Customer ${queryParams.toString() ? 'WHERE ' + queryParams.toString() : ''} ORDER BY Name` },
+        params: { 
+          query,
+          minorversion: '65',
+          ...(params.limit && { maxresults: params.limit.toString() }),
+          ...(params.offset && { startposition: params.offset.toString() }),
+        },
       });
 
       return response.data.QueryResponse.Customer || [];

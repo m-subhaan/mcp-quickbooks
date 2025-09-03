@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { QuickBooksService } from './services/quickbooks';
+import { ClaudeService } from './services/claude';
 import { safeLog } from './utils/logger';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors({
 }));
 
 const quickbooksService = new QuickBooksService();
+const claudeService = new ClaudeService(quickbooksService);
 
 // OAuth callback handler
 app.get('/api/auth/callback', async (req, res) => {
@@ -75,17 +77,43 @@ app.get('/api/auth/initiate', (_req, res) => {
   }
 });
 
-// Chat endpoint (placeholder for now)
-app.post('/api/chat', (req, res) => {
+// Chat endpoint with Claude integration
+app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
   
-  res.json({
-    success: true,
-    data: {
-      response: `This is a placeholder response. In production, this would connect to Claude Desktop MCP client. You said: "${message}"`,
-      timestamp: new Date().toISOString(),
-    },
-  });
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: 'Message is required and must be a string',
+    });
+  }
+
+  try {
+    safeLog('info', 'Processing chat message', { message: message.substring(0, 100) + '...' });
+    
+    const result = await claudeService.processMessage(message);
+    
+    safeLog('info', 'Chat message processed successfully', { 
+      hasData: !!result.data,
+      hasError: !!result.error 
+    });
+    
+    res.json({
+      success: true,
+      data: {
+        response: result.response,
+        data: result.data,
+        timestamp: new Date().toISOString(),
+        error: result.error,
+      },
+    });
+  } catch (error) {
+    safeLog('error', 'Failed to process chat message', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process message',
+    });
+  }
 });
 
 // Health check endpoint

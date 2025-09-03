@@ -1,256 +1,285 @@
 # QuickBooks MCP Chat Assistant
 
-A complete application that connects Claude Desktop to QuickBooks Online through a custom MCP (Model Context Protocol) server, enabling natural language queries about your financial data.
+A powerful chat interface that connects to QuickBooks data using Claude AI and the Model Context Protocol (MCP). This application allows you to ask natural language questions about your QuickBooks data and get intelligent responses powered by Claude.
 
-## 🚀 Features
+## Features
 
-- **Modern Chat UI**: React + TypeScript frontend with iMessage-style chat interface
-- **MCP Integration**: Custom MCP server that wraps QuickBooks Online REST API
-- **OAuth2 Authentication**: Secure QuickBooks authentication flow
-- **Real-time Data**: Fetch customers, invoices, accounts, and financial reports
-- **JSON Visualization**: Expandable JSON cards for data inspection
-- **Error Handling**: Graceful error handling and user feedback
-- **Responsive Design**: Works on desktop and mobile devices
+- 🔐 **OAuth 2.0 Authentication** with QuickBooks Online
+- 🤖 **Claude AI Integration** for intelligent data analysis
+- 💬 **Real-time Chat Interface** with message history
+- 📊 **QuickBooks Data Access**: Customers, Invoices, Accounts, Reports
+- 🎨 **Modern UI** built with React, TypeScript, and Tailwind CSS
+- 🔄 **Token Management** with automatic refresh
+- 📱 **Responsive Design** for all devices
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React Frontend│    │  Claude Desktop │    │  QuickBooks API │
-│   (Port 3000)   │◄──►│   (MCP Client)  │◄──►│   (Sandbox)     │
+│   Frontend      │    │   Backend       │    │   External      │
+│   (React)       │◄──►│   (Express +    │◄──►│   APIs          │
+│                 │    │    MCP Server)   │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│ Express Server  │    │   MCP Server    │
-│ (Port 3001)     │    │ (QuickBooks)    │
-└─────────────────┘    └─────────────────┘
+                              │
+                              ▼
+                       ┌─────────────────┐
+                       │   Claude AI     │
+                       │   (Anthropic)   │
+                       └─────────────────┘
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+ and npm
-- Claude Desktop installed and configured
-- QuickBooks Online Developer Account (Sandbox)
-- Your QuickBooks API credentials (already included)
+- QuickBooks Developer Account
+- Anthropic API Key
+- Git
 
-## 🛠️ Installation & Setup
+## Setup Instructions
 
-### 1. Clone and Install Dependencies
-
-```bash
-git clone <repository-url>
-cd my-quickbook-gpt
-npm run install:all
-```
-
-### 2. Environment Setup
-
-Copy the environment template and update with your values:
+### 1. Clone the Repository
 
 ```bash
-cp mcp-server/env.example mcp-server/.env
+git clone https://github.com/m-subhaan/mcp-quickbooks.git
+cd mcp-quickbooks
 ```
 
-The file already includes your QuickBooks credentials:
-- Client ID: `ABVJ1VQRUP8oilJBXD3UsnOPrGxD9Qjug7ioqBhUYm1gMZmmS1`
-- Client Secret: `MKWbMl9vhbmBKI10H0UpfZe4EbhGohRsO17Oc0s5`
+### 2. Install Dependencies
 
-### 3. Build the MCP Server
+```bash
+# Install root dependencies
+npm install
+
+# Install frontend dependencies
+cd frontend
+npm install
+
+# Install backend dependencies
+cd ../mcp-server
+npm install
+```
+
+### 3. Configure Environment Variables
+
+#### QuickBooks Setup
+
+1. Go to [Intuit Developer](https://developer.intuit.com/)
+2. Create a new app or use existing one
+3. Configure OAuth settings:
+   - **Redirect URI**: `http://localhost:3001/api/auth/callback`
+   - **Scopes**: `com.intuit.quickbooks.accounting`
+
+#### Environment Configuration
+
+Copy the example environment file and configure it:
 
 ```bash
 cd mcp-server
-npm run build
-cd ..
+cp env.example .env
 ```
 
-### 4. Configure Claude Desktop
+Edit `.env` file with your credentials:
 
-Copy the `mcp.json` file to your Claude Desktop configuration directory:
+```env
+# QuickBooks API Configuration
+QUICKBOOKS_CLIENT_ID=your_quickbooks_client_id
+QUICKBOOKS_CLIENT_SECRET=your_quickbooks_client_secret
+QUICKBOOKS_REDIRECT_URI=http://localhost:3001/api/auth/callback
+QUICKBOOKS_ENVIRONMENT=sandbox
+
+# Anthropic API Configuration
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3000
+
+# Logging
+LOG_LEVEL=info
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+```
+
+### 4. Start the Application
+
+#### Option A: Using Setup Scripts
 
 **Windows:**
 ```bash
-copy mcp.json "%APPDATA%\Claude\mcp.json"
+setup.bat
 ```
 
-**macOS:**
+**Linux/Mac:**
 ```bash
-cp mcp.json ~/Library/Application\ Support/Claude/mcp.json
+chmod +x setup.sh
+./setup.sh
 ```
 
-**Linux:**
-```bash
-cp mcp.json ~/.config/Claude/mcp.json
-```
+#### Option B: Manual Start
 
-### 5. Start the Application
-
+**Terminal 1 - Backend:**
 ```bash
-# Start both frontend and backend servers
+cd mcp-server
 npm run dev
-
-# Or start them separately:
-npm run dev:frontend  # Frontend on http://localhost:3000
-npm run dev:server    # Backend on http://localhost:3001
 ```
 
-## 🔧 Development
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+### 5. Access the Application
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **Health Check**: http://localhost:3001/health
+
+## Usage
+
+### 1. Connect to QuickBooks
+
+1. Open the application in your browser
+2. Click "Connect to QuickBooks"
+3. Complete the OAuth flow
+4. You'll be redirected back with a success message
+
+### 2. Start Chatting
+
+Once connected, you can ask questions like:
+
+- **"List all customers"**
+- **"Show me invoices from last month"**
+- **"What's my profit and loss for this year?"**
+- **"Show me my balance sheet as of today"**
+- **"Find customer named John Smith"**
+- **"Show me the top 10 invoices by amount"**
+
+### 3. Understanding Responses
+
+The AI will:
+- Analyze your QuickBooks data
+- Provide insights and observations
+- Format numbers and currency appropriately
+- Suggest actionable insights
+- Display the raw data in a collapsible JSON viewer
+
+## API Endpoints
+
+### Authentication
+- `GET /api/auth/status` - Check authentication status
+- `GET /api/auth/initiate` - Start OAuth flow
+- `GET /api/auth/callback` - OAuth callback handler
+
+### Chat
+- `POST /api/chat` - Send message to Claude AI
+
+### QuickBooks Data (via MCP)
+- `GET /api/tools/customers` - Get customers
+- `GET /api/tools/invoices` - Get invoices
+- `GET /api/tools/accounts` - Get accounts
+- `POST /api/tools/profit-and-loss` - Get P&L report
+- `POST /api/tools/balance-sheet` - Get balance sheet
+
+## Development
 
 ### Project Structure
 
 ```
-├── frontend/                 # React + Vite frontend
+├── frontend/                 # React frontend
 │   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── types/           # TypeScript type definitions
+│   │   ├── components/       # React components
 │   │   ├── utils/           # Utility functions
-│   │   └── App.tsx          # Main app component
+│   │   └── types/           # TypeScript types
 │   └── package.json
-├── mcp-server/              # MCP server implementation
+├── mcp-server/              # Backend server
 │   ├── src/
-│   │   ├── mcp/             # MCP protocol implementation
-│   │   ├── services/        # QuickBooks API service
-│   │   ├── types/           # TypeScript types
-│   │   └── utils/           # Utilities and logging
+│   │   ├── mcp/             # MCP server implementation
+│   │   ├── services/        # Business logic
+│   │   └── utils/           # Utilities
 │   └── package.json
-├── mcp.json                 # Claude Desktop MCP config
-└── README.md
+└── mcp.json                 # MCP configuration
 ```
 
-### Available Scripts
+### Key Technologies
 
-```bash
-# Root level
-npm run dev              # Start both frontend and backend
-npm run build            # Build both applications
-npm run install:all      # Install all dependencies
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Vite
+- **Backend**: Node.js, Express, TypeScript
+- **AI**: Claude 3 Sonnet (Anthropic)
+- **Protocol**: Model Context Protocol (MCP)
+- **Database**: QuickBooks Online API
+- **Authentication**: OAuth 2.0
 
-# Frontend
-cd frontend
-npm run dev              # Start Vite dev server
-npm run build            # Build for production
-npm run preview          # Preview production build
+### Adding New Features
 
-# MCP Server
-cd mcp-server
-npm run dev              # Start with tsx watch
-npm run build            # Build TypeScript
-npm run start            # Start production server
-```
+1. **New QuickBooks Data**: Add methods to `QuickBooksService`
+2. **New Chat Intents**: Extend `ClaudeService.extractIntent()`
+3. **UI Components**: Add to `frontend/src/components/`
+4. **API Endpoints**: Add to `express-server.ts`
 
-## 🔌 MCP Tools Available
-
-The MCP server exposes the following tools to Claude Desktop:
-
-### Authentication
-- `getAuthStatus` - Check current authentication status
-- `initiateAuth` - Start OAuth2 authentication flow
-
-### Data Retrieval
-- `getCustomers` - Fetch customers with optional filtering
-- `getInvoices` - Fetch invoices within date ranges
-- `getAccounts` - Fetch chart of accounts
-- `getProfitAndLoss` - Generate P&L reports
-- `getBalanceSheet` - Generate balance sheet reports
-
-### Example Tool Usage
-
-```json
-{
-  "name": "getInvoices",
-  "description": "Fetch invoices from QuickBooks within a date range",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "startDate": { "type": "string", "format": "date" },
-      "endDate": { "type": "string", "format": "date" }
-    },
-    "required": ["startDate", "endDate"]
-  }
-}
-```
-
-## 🔐 Security Features
-
-- **OAuth2 Flow**: Secure QuickBooks authentication
-- **Token Management**: Automatic refresh of access tokens
-- **Environment Variables**: Sensitive data stored in .env files
-- **Input Validation**: Zod schema validation for all inputs
-- **Error Sanitization**: Sensitive data removed from logs
-- **CORS Protection**: Configured CORS for frontend-backend communication
-
-## 🎨 UI/UX Features
-
-- **Modern Design**: Clean, professional interface using Tailwind CSS
-- **Responsive Layout**: Works on desktop and mobile devices
-- **Real-time Updates**: Live chat interface with loading states
-- **JSON Visualization**: Collapsible JSON cards with syntax highlighting
-- **Error Handling**: User-friendly error messages and toast notifications
-- **Accessibility**: Proper ARIA labels and keyboard navigation
-
-## 🚀 Usage Examples
-
-### Natural Language Queries
-
-Users can ask questions like:
-- "Show me invoices from last week"
-- "List all customers"
-- "Get my profit and loss report for this month"
-- "Show me account balances"
-- "Find invoices over $1000"
-
-### Authentication Flow
-
-1. User clicks "Connect QuickBooks" in the frontend
-2. OAuth2 flow opens in new window
-3. User authenticates with QuickBooks
-4. Callback redirects to frontend with success status
-5. Frontend updates authentication status
-6. User can now send chat messages
-
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
-**MCP Server Won't Start**
-- Check that all environment variables are set
-- Ensure Node.js version is 18+
-- Verify TypeScript compilation: `npm run build`
+1. **OAuth Redirect Error**
+   - Ensure redirect URI matches exactly in Intuit Developer Console
+   - Check that `.env` has correct `QUICKBOOKS_REDIRECT_URI`
 
-**Authentication Fails**
-- Verify QuickBooks credentials in .env
-- Check redirect URI matches QuickBooks app settings
-- Ensure sandbox environment is selected
+2. **Claude API Errors**
+   - Verify `ANTHROPIC_API_KEY` is set correctly
+   - Check API key has sufficient credits
 
-**Frontend Can't Connect**
-- Check that backend server is running on port 3001
-- Verify CORS settings in backend
-- Check browser console for errors
+3. **Connection Refused**
+   - Ensure both frontend and backend are running
+   - Check ports 3000 and 3001 are available
 
-**Claude Desktop Integration**
-- Verify mcp.json is in correct location
-- Restart Claude Desktop after configuration changes
-- Check Claude Desktop logs for MCP errors
+4. **Authentication Issues**
+   - Clear browser cache and cookies
+   - Restart both servers
+   - Check QuickBooks app is in correct environment (sandbox/production)
 
 ### Debug Mode
 
-Enable debug logging by setting:
-```bash
+Enable debug logging by setting `LOG_LEVEL=debug` in `.env`:
+
+```env
 LOG_LEVEL=debug
 ```
 
-## 📝 API Endpoints
+## Security Considerations
 
-### Authentication
-- `GET /api/auth/status` - Get authentication status
-- `GET /api/auth/initiate` - Start OAuth flow
-- `GET /auth/callback` - OAuth callback handler
+- Never commit `.env` files to version control
+- Use environment variables for all sensitive data
+- Implement proper CORS policies for production
+- Use HTTPS in production environments
+- Regularly rotate API keys
 
-### Health
-- `GET /health` - Health check endpoint
+## Production Deployment
 
-## 🤝 Contributing
+### Environment Variables
+
+```env
+NODE_ENV=production
+QUICKBOOKS_ENVIRONMENT=production
+FRONTEND_URL=https://yourdomain.com
+ALLOWED_ORIGINS=https://yourdomain.com
+```
+
+### Build Commands
+
+```bash
+# Build frontend
+cd frontend
+npm run build
+
+# Build backend
+cd ../mcp-server
+npm run build
+```
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -258,18 +287,23 @@ LOG_LEVEL=debug
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License.
+MIT License - see LICENSE file for details
 
-## 🙏 Acknowledgments
+## Support
 
-- QuickBooks Online API for financial data access
-- Claude Desktop for MCP client implementation
-- Model Context Protocol for standardized tool integration
-- React and Vite for modern frontend development
-- Tailwind CSS for styling
+For issues and questions:
+- Create an issue on GitHub
+- Check the troubleshooting section
+- Review the logs for error details
 
----
+## Roadmap
 
-**Note**: This is a development/sandbox implementation. For production use, ensure proper security measures, error handling, and compliance with QuickBooks API terms of service.
+- [ ] Multi-company support
+- [ ] Advanced reporting features
+- [ ] Data export capabilities
+- [ ] Mobile app
+- [ ] Real-time notifications
+- [ ] Advanced AI features (predictions, insights)
+- [ ] Integration with other accounting platforms

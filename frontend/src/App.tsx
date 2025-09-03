@@ -67,34 +67,42 @@ function App() {
     setIsLoading(true);
 
     try {
-      // For now, we'll simulate a response since we need to integrate with Claude Desktop
-      // In a real implementation, this would connect to Claude Desktop MCP client
-      setTimeout(() => {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `I understand you want to know about "${content}". This is a simulated response. In the full implementation, this would connect to Claude Desktop which would use the MCP server to fetch data from QuickBooks.`,
-          timestamp: new Date(),
-          data: {
-            message: content,
-            timestamp: new Date().toISOString(),
-            note: "This is simulated data. The real implementation would show actual QuickBooks data here."
-          }
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-        setIsLoading(false);
-      }, 2000);
+      const response = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: content }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get response');
+      }
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: result.data.response,
+        timestamp: new Date(),
+        data: result.data.data,
+        error: result.data.error,
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error processing your request.',
+        content: 'Sorry, I encountered an error processing your request. Please try again.',
         timestamp: new Date(),
-        error: 'Failed to process request',
+        error: error instanceof Error ? error.message : 'Failed to process request',
       };
       setMessages(prev => [...prev, errorMessage]);
-      setIsLoading(false);
       toast.error('Failed to process your request');
+    } finally {
+      setIsLoading(false);
     }
   };
 

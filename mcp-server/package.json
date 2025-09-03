@@ -1,40 +1,38 @@
 {
-  "name": "quickbooks-mcp-server",
+  "name": "mcp-quickbooks-server",
   "version": "1.0.0",
-  "description": "MCP server for QuickBooks Online API integration",
+  "description": "MCP server for QuickBooks integration",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "lint": "eslint src --ext .ts",
-    "test": "jest"
+    "dev": "tsx watch src/index.ts",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.18.0",
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "node-cron": "^3.0.3",
-    "node-quickbooks": "^2.0.43",
-    "winston": "^3.11.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "@types/jest": "^29.5.6",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/node": "^20.8.0",
-    "@types/node-cron": "^3.0.11",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
-    "eslint": "^8.52.0",
-    "jest": "^29.7.0",
+    "@types/node": "^20.10.0",
+    "eslint": "^8.55.0",
     "tsx": "^4.6.0",
-    "typescript": "^5.2.2"
-  }
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "mcp",
+    "quickbooks",
+    "claude",
+    "ai"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 }
