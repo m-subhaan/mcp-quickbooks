@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "quickbooks": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "QUICKBOOKS_CLIENT_ID": "ABVJ1VQRUP8oilJBXD3UsnOPrGxD9Qjug7ioqBhUYm1gMZmmS1",
+        "QUICKBOOKS_CLIENT_SECRET": "MKWbMl9vhbmBKI10H0UpfZe4EbhGohRsO17Oc0s5",
+        "QUICKBOOKS_REDIRECT_URI": "http://localhost:3001/api/auth/callback",
+        "QUICKBOOKS_ENVIRONMENT": "sandbox",
+        "JWT_SECRET": "your-super-secret-jwt-key-change-this-in-production",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}
